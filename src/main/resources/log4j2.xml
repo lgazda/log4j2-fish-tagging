@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration monitorInterval="5" status="DEBUG">
+    <Properties>
+        <!-- empty - default value if no sys parameter is passed -->
+        <Property name="log.dir"></Property>
+        <Property name="logFileName">log4jfishing.log</Property>
+        <Property name="traceLogFileName">log4jfishing.trace.log</Property>
+        <Property name="mainLogRollingFilePattern">log4jfishing.%i.log</Property>
+        <!-- log fishing-uuid thread context param -->
+        <Property name="patternLayout">%d [%t] %-5level %c - [%X{fishing-tag}] %msg%n</Property>
+    </Properties>
+
+    <Filters>
+        <!-- if ThreadContext.put("fishing-level", ["trace", "debug"]) is set log to trace file -->
+        <DynamicThresholdFilter key="fishing-level" defaultThreshold="INFO" onMatch="ACCEPT" onMismatch="NEUTRAL">
+            <KeyValuePair key="trace" value="TRACE"/>
+            <KeyValuePair key="debug" value="DEBUG"/>
+        </DynamicThresholdFilter>
+    </Filters>
+
+    <Loggers>
+
+        <AsyncLogger name="org.springframework.web" level="INFO">
+            <AppenderRef ref="TraceFlowLogFile">
+                <ContextMapFilter onMatch="ACCEPT" onMismatch="DENY">
+                    <KeyValuePair key="fishing-level" value="trace"/>
+                    <KeyValuePair key="fishing-level" value="debug"/>
+                </ContextMapFilter>
+            </AppenderRef>
+        </AsyncLogger>
+
+        <AsyncLogger name="pl.net.gazda" level="INFO">
+            <AppenderRef ref="TraceFlowLogFile">
+                <ContextMapFilter onMatch="ACCEPT" onMismatch="DENY">
+                    <KeyValuePair key="fishing-level" value="trace"/>
+                    <KeyValuePair key="fishing-level" value="debug"/>
+                </ContextMapFilter>
+            </AppenderRef>
+        </AsyncLogger>
+
+        <Root level="INFO">
+            <!-- blocks root logger to be polluted with trace -->
+            <ContextMapFilter onMatch="DENY" onMismatch="ACCEPT">
+                <KeyValuePair key="fishing-level" value="trace"/>
+                <KeyValuePair key="fishing-level" value="debug"/>
+            </ContextMapFilter>
+            <AppenderRef ref="Console" />>
+            <AppenderRef ref="MainLogFile" />
+        </Root>
+    </Loggers>
+
+    <Appenders>
+        <Console name="Console" target="SYSTEM_OUT">
+            <PatternLayout pattern="${sd:patternLayout}"/>
+        </Console>
+        <RollingRandomAccessFile name="MainLogFile" fileName="${sys:log.dir}${sd:logFileName}" immediateFlush="true" append="true" filePattern="${sys:log.dir}${sd:mainLogRollingFilePattern}">
+            <PatternLayout pattern="${sd:patternLayout}"/>
+            <Policies>
+                <SizeBasedTriggeringPolicy size="10 MB"/>
+            </Policies>
+            <DefaultRolloverStrategy min="1" max="10"/>
+        </RollingRandomAccessFile >
+        <RollingRandomAccessFile name="TraceFlowLogFile" fileName="${sys:log.dir}${sd:traceLogFileName}" immediateFlush="true" append="false" filePattern="${sys:log.dir}${sd:traceLogRollingFilePattern}">
+            <PatternLayout pattern="${sd:patternLayout}"/>
+            <Policies>
+                <SizeBasedTriggeringPolicy size="10 MB"/>
+            </Policies>
+            <DefaultRolloverStrategy min="1" max="5"/>
+        </RollingRandomAccessFile >
+    </Appenders>
+</Configuration>
