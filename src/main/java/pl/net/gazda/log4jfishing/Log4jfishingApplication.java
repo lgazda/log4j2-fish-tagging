@@ -25,22 +25,22 @@ import static org.apache.logging.log4j.util.Strings.isBlank;
 public class Log4jfishingApplication {
     private static final Logger LOG = LoggerFactory.getLogger(Log4jfishingApplication.class);
 
-	public static void main(String[] args) {
-		SpringApplication.run(Log4jfishingApplication.class, args);
-	}
+    public static void main(String[] args) {
+        SpringApplication.run(Log4jfishingApplication.class, args);
+    }
 
     /**
      * For request tracking set the following request headers
      * fishing-tag : 'my-fishing-tag'
      * fishing-level: ['debug', 'trace']
      */
-	@RequestMapping("/fishing")
-	public ResponseEntity<Object> handle(@RequestHeader Map<String, String> headers) {
+    @RequestMapping("/fishing")
+    public ResponseEntity<Object> handle(@RequestHeader Map<String, String> headers) {
         LOG.info("/fishing request");
         LOG.debug("/fishing with DEBUG");
         LOG.trace("/fishing with TRACE, request headers: {}", headers);
         return ResponseEntity.ok().build();
-	}
+    }
 
     @Configuration
     public class WebConfig {
@@ -70,31 +70,31 @@ public class Log4jfishingApplication {
         }
     }
 
-	public static class LoggingContext {
+    public static class LoggingContext {
         private static final Logger LOG = LoggerFactory.getLogger(LoggingContext.class);
 
-		public static final String FISHING_TAG_KEY = "fishing-tag";
+        public static final String FISHING_TAG_KEY = "fishing-tag";
         public static final String FISHING_LEVEL_KEY = "fishing-level";
 
-		private static void start(String uuid, String level) {
-			setLevel(level);
-			setFishingTag(uuid);
+        private static void start(String uuid, String level) {
+            setLevel(level);
+            setFishingTag(uuid);
 
             LOG.debug("Started LoggingContext with tag: [{}] level: [{}]", uuid, level);
-		}
+        }
 
-		private static void setFishingTag(String tag) {
-			ThreadContext.put(FISHING_TAG_KEY, tag);
-		}
+        private static void setFishingTag(String tag) {
+            ThreadContext.put(FISHING_TAG_KEY, tag);
+        }
 
-		private static void setLevel(String level) {
-			ThreadContext.put(FISHING_LEVEL_KEY, level);
-		}
+        private static void setLevel(String level) {
+            ThreadContext.put(FISHING_LEVEL_KEY, level);
+        }
 
-		public static void clear() {
+        public static void clear() {
             LOG.debug("Clearing LoggingContext");
             LOG.trace("Clearing LoggingContext with context: {}", ThreadContext.getContext());
-			ThreadContext.clearAll();
-		}
-	}
+            ThreadContext.clearAll();
+        }
+    }
 }
