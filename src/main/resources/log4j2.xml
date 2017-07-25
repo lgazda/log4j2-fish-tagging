@@ -50,22 +50,24 @@
     </Loggers>
 
     <Appenders>
+        <!-- be carefull it's very slooow, disable it on production/perf test env -->
+        <!-- for more check: https://logging.apache.org/log4j/2.x/performance.html #Trade-offs -->
         <Console name="Console" target="SYSTEM_OUT">
             <PatternLayout pattern="${sd:patternLayout}"/>
         </Console>
         <RollingRandomAccessFile name="MainLogFile" fileName="${sys:log.dir}${sd:logFileName}" immediateFlush="true" append="true" filePattern="${sys:log.dir}${sd:mainLogRollingFilePattern}">
-            <PatternLayout pattern="${sd:patternLayout}"/>
+            <PatternLayout pattern="${sd:patternLayout}" />
             <Policies>
                 <SizeBasedTriggeringPolicy size="10 MB"/>
             </Policies>
-            <DefaultRolloverStrategy min="1" max="10"/>
+            <DefaultRolloverStrategy min="1" max="10" fileIndex="min" />
         </RollingRandomAccessFile >
         <RollingRandomAccessFile name="TraceFlowLogFile" fileName="${sys:log.dir}${sd:traceLogFileName}" immediateFlush="true" append="false" filePattern="${sys:log.dir}${sd:traceLogRollingFilePattern}">
             <PatternLayout pattern="${sd:patternLayout}"/>
             <Policies>
                 <SizeBasedTriggeringPolicy size="10 MB"/>
             </Policies>
-            <DefaultRolloverStrategy min="1" max="5"/>
+            <DefaultRolloverStrategy min="1" max="5" fileIndex="min" />
         </RollingRandomAccessFile >
     </Appenders>
 </Configuration>
