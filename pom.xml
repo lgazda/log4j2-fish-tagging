@@ -9,7 +9,7 @@
 	<packaging>jar</packaging>
 
 	<name>log4jfishing</name>
-	<description>Demo project for Spring Boot</description>
+	<description>log4j tag fishing spring boot demo app</description>
 
 	<parent>
 		<groupId>org.springframework.boot</groupId>
@@ -90,6 +90,5 @@
 			</plugin>
 		</plugins>
 	</build>
-
 
 </project>

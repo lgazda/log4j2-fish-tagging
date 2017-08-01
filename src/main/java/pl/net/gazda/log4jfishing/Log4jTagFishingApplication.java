@@ -22,11 +22,11 @@ import static org.apache.logging.log4j.util.Strings.isBlank;
 
 @SpringBootApplication
 @RestController
-public class Log4jfishingApplication {
-    private static final Logger LOG = LoggerFactory.getLogger(Log4jfishingApplication.class);
+public class Log4jTagFishingApplication {
+    private static final Logger LOG = LoggerFactory.getLogger(Log4jTagFishingApplication.class);
 
     public static void main(String[] args) {
-        SpringApplication.run(Log4jfishingApplication.class, args);
+        SpringApplication.run(Log4jTagFishingApplication.class, args);
     }
 
     /**
@@ -49,16 +49,22 @@ public class Log4jfishingApplication {
             return new AbstractRequestLoggingFilter() {
                 @Override
                 protected void beforeRequest(HttpServletRequest httpServletRequest, String s) {
-                    String fishingLevel = httpServletRequest.getHeader(LoggingContext.FISHING_LEVEL_KEY);
+                    String fishingTag = getTag(httpServletRequest);
+                    String fishingLevel = getLevel(httpServletRequest);
+                    LoggingContext.start(fishingTag, fishingLevel);
+                }
+
+                private String getTag(HttpServletRequest httpServletRequest) {
                     String fishingTag = httpServletRequest.getHeader(LoggingContext.FISHING_TAG_KEY);
-                    LoggingContext.start(getTag(fishingTag), getLevel(fishingLevel));
+                    return isBlank(fishingTag) ? getRandomUUID() : fishingTag;
                 }
 
-                private String getTag(String fishingTag) {
-                    return isBlank(fishingTag) ? UUID.randomUUID().toString() : fishingTag;
+                private String getRandomUUID() {
+                    return UUID.randomUUID().toString();
                 }
 
-                private String getLevel(String fishingLevel) {
+                private String getLevel(HttpServletRequest httpServletRequest) {
+                    String fishingLevel = httpServletRequest.getHeader(LoggingContext.FISHING_LEVEL_KEY);
                     return isBlank(fishingLevel) ? fishingLevel : fishingLevel.trim().toLowerCase();
                 }
 
@@ -70,11 +76,11 @@ public class Log4jfishingApplication {
         }
     }
 
-    public static class LoggingContext {
+    static class LoggingContext {
         private static final Logger LOG = LoggerFactory.getLogger(LoggingContext.class);
 
-        public static final String FISHING_TAG_KEY = "fishing-tag";
-        public static final String FISHING_LEVEL_KEY = "fishing-level";
+        static final String FISHING_TAG_KEY = "fishing-tag";
+        static final String FISHING_LEVEL_KEY = "fishing-level";
 
         private static void start(String uuid, String level) {
             setLevel(level);
@@ -91,7 +97,7 @@ public class Log4jfishingApplication {
             ThreadContext.put(FISHING_LEVEL_KEY, level);
         }
 
-        public static void clear() {
+        static void clear() {
             LOG.debug("Clearing LoggingContext");
             LOG.trace("Clearing LoggingContext with context: {}", ThreadContext.getContext());
             ThreadContext.clearAll();
