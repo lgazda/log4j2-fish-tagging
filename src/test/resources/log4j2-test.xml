@@ -7,7 +7,7 @@
         <Property name="traceLogFileName">log4jfishing.trace.log</Property>
         <Property name="mainLogRollingFilePattern">log4jfishing.%i.log</Property>
         <!-- log fishing-uuid thread context param -->
-        <Property name="patternLayout">%d [%t] %-5level %c - [%X{fishing-tag}] %msg%n</Property>
+        <Property name="patternLayout">%d test: [%t] %-5level %c - [%X{fishing-tag}] %msg%n</Property>
     </Properties>
 
     <Filters>
@@ -38,11 +38,6 @@
         </AsyncLogger>
 
         <Root level="INFO">
-            <!-- blocks root logger to be polluted with trace -->
-            <ContextMapFilter onMatch="DENY" onMismatch="ACCEPT">
-                <KeyValuePair key="fishing-level" value="trace"/>
-                <KeyValuePair key="fishing-level" value="debug"/>
-            </ContextMapFilter>
             <AppenderRef ref="Console" />>
             <AppenderRef ref="MainLogFile" />
         </Root>
