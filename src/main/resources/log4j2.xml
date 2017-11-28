@@ -12,7 +12,7 @@
 
     <Filters>
         <!-- if ThreadContext.put("fishing-level", ["trace", "debug"]) is set log to trace file -->
-        <DynamicThresholdFilter key="fishing-level" defaultThreshold="INFO" onMatch="ACCEPT" onMismatch="NEUTRAL">
+        <DynamicThresholdFilter key="fishing-level" onMatch="ACCEPT" onMismatch="NEUTRAL">
             <KeyValuePair key="trace" value="TRACE"/>
             <KeyValuePair key="debug" value="DEBUG"/>
         </DynamicThresholdFilter>
