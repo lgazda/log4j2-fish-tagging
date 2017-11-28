@@ -19,37 +19,31 @@
     </Filters>
 
     <Loggers>
-        <AsyncLogger name="org.springframework.web" level="INFO">
-            <AppenderRef ref="TraceFlowLogFile">
-                <ContextMapFilter onMatch="ACCEPT" onMismatch="DENY">
-                    <KeyValuePair key="fishing-level" value="trace"/>
-                    <KeyValuePair key="fishing-level" value="debug"/>
-                </ContextMapFilter>
-            </AppenderRef>
-        </AsyncLogger>
-
-        <AsyncLogger name="pl.net.gazda" level="INFO">
-            <AppenderRef ref="TraceFlowLogFile">
-                <ContextMapFilter onMatch="ACCEPT" onMismatch="DENY">
-                    <KeyValuePair key="fishing-level" value="trace"/>
-                    <KeyValuePair key="fishing-level" value="debug"/>
-                </ContextMapFilter>
-            </AppenderRef>
-        </AsyncLogger>
+        <AsyncLogger name="pl.net.gazda" level="INFO" />
 
         <Root level="INFO">
-            <!-- blocks root logger to be polluted with trace -->
-            <ContextMapFilter onMatch="DENY" onMismatch="ACCEPT">
-                <KeyValuePair key="fishing-level" value="trace"/>
-                <KeyValuePair key="fishing-level" value="debug"/>
-            </ContextMapFilter>
-            <AppenderRef ref="Console" />>
-            <AppenderRef ref="MainLogFile" />
+            <AppenderRef ref="Console">
+                <!-- everything goes to Console -->
+            </AppenderRef>
+            <AppenderRef ref="MainLogFile">
+                <!-- blocks root logger to be polluted with trace -->
+                <ContextMapFilter onMatch="DENY" onMismatch="ACCEPT">
+                    <KeyValuePair key="fishing-level" value="trace"/>
+                    <KeyValuePair key="fishing-level" value="debug"/>
+                </ContextMapFilter>
+            </AppenderRef>
+            <AppenderRef ref="TraceFlowLogFile">
+                <!-- if fishing-level is set logs are sent to trace log file -->
+                <ContextMapFilter onMatch="ACCEPT" onMismatch="DENY">
+                    <KeyValuePair key="fishing-level" value="trace"/>
+                    <KeyValuePair key="fishing-level" value="debug"/>
+                </ContextMapFilter>
+            </AppenderRef>
         </Root>
     </Loggers>
 
     <Appenders>
-        <!-- be carefull it's very slooow, disable it on production/perf test env -->
+        <!-- be careful it's very slow, disable it on production/perf test env -->
         <!-- for more check: https://logging.apache.org/log4j/2.x/performance.html #Trade-offs -->
         <Console name="Console" target="SYSTEM_OUT">
             <PatternLayout pattern="${sd:patternLayout}"/>
